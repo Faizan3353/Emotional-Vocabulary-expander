@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Field Key to Feeling — an emotional vocabulary expander</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink-950:#12160f;
+    --ink-900:#181f16;
+    --ink-800:#212a1e;
+    --ink-700:#2b3527;
+    --line: rgba(233,227,204,0.14);
+    --parchment:#e9e3cc;
+    --parchment-dim:#d9d3b8;
+    --text:#ede9d8;
+    --text-dim:#b9b6a3;
+    --on-paper:#242820;
+    --on-paper-dim:#5c5c4c;
+    --berry:#b4506b;
+    --berry-dim:#7d3c4d;
+    --moss:#7c9b73;
+    --moss-dim:#526b4c;
+    --gold:#c9a227;
+    --mono:#97998c;
+    --radius: 3px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--ink-950);
+    background-image:
+      radial-gradient(ellipse at 20% -10%, rgba(124,155,115,0.10), transparent 55%),
+      radial-gradient(ellipse at 100% 10%, rgba(180,80,107,0.08), transparent 45%);
+    color:var(--text);
+    font-family:'Public Sans', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  .display{ font-family:'Fraunces', serif; }
+  .mono{ font-family:'IBM Plex Mono', monospace; letter-spacing:0.02em; }
+
+  a{ color:inherit; }
+
+  /* ---------- shell ---------- */
+  .shell{ max-width:920px; margin:0 auto; padding:0 24px 80px; }
+  header.top{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:32px 0 24px; border-bottom:1px solid var(--line);
+    margin-bottom:40px; gap:16px; flex-wrap:wrap;
+  }
+  .brand{ display:flex; align-items:baseline; gap:10px; }
+  .brand .mark{
+    width:28px;height:28px;border:1px solid var(--gold); border-radius:50%;
+    display:inline-flex; align-items:center; justify-content:center;
+    font-size:12px; color:var(--gold); flex:none;
+  }
+  .brand h1{ font-size:19px; font-weight:500; margin:0; letter-spacing:0.01em;}
+  .brand .sub{ font-size:11.5px; color:var(--mono); margin-top:2px;}
+  nav.tabs{ display:flex; gap:4px; }
+  nav.tabs button{
+    background:none; border:1px solid transparent; color:var(--text-dim);
+    font-family:'IBM Plex Mono',monospace; font-size:12.5px; padding:8px 14px;
+    cursor:pointer; border-radius:999px; transition:all .15s ease;
+  }
+  nav.tabs button.active{ color:var(--ink-950); background:var(--parchment); }
+  nav.tabs button:not(.active):hover{ color:var(--text); border-color:var(--line); }
+
+  /* ---------- trail ---------- */
+  .trail{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:28px; min-height:26px; }
+  .tag{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--mono);
+    border:1px solid var(--line); padding:4px 10px; border-radius:2px;
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  .tag b{ color:var(--gold); font-weight:500; }
+
+  /* ---------- cards ---------- */
+  .card{
+    background:var(--ink-900); border:1px solid var(--line);
+    border-radius:6px; padding:36px;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:0.08em;
+    text-transform:uppercase; color:var(--gold); margin:0 0 14px;
+  }
+  h2.q{ font-family:'Fraunces',serif; font-weight:500; font-size:28px; line-height:1.35; margin:0 0 28px; max-width:560px;}
+  .helper{ font-size:13px; color:var(--text-dim); margin-top:-14px; margin-bottom:24px;}
+
+  .choice-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:640px){ .choice-grid{ grid-template-columns:1fr; } }
+  .choice{
+    text-align:left; background:var(--ink-800); border:1px solid var(--line);
+    color:var(--text); padding:20px 20px; border-radius:5px; cursor:pointer;
+    font-family:'Public Sans',sans-serif; font-size:15px; line-height:1.5;
+    transition:border-color .15s ease, transform .15s ease, background .15s ease;
+  }
+  .choice small{ display:block; color:var(--text-dim); font-size:12.5px; margin-top:4px;}
+  .choice:hover{ border-color:var(--gold); background:var(--ink-700); transform:translateY(-1px); }
+
+  /* ---------- input stage ---------- */
+  .word-input{
+    width:100%; background:var(--ink-800); border:1px solid var(--line); color:var(--text);
+    font-family:'Fraunces',serif; font-size:24px; padding:16px 18px; border-radius:5px; margin-bottom:20px;
+  }
+  .word-input:focus{ outline:none; border-color:var(--gold); }
+  .quickwords{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:28px; }
+  .quickwords button{
+    background:none; border:1px solid var(--line); color:var(--text-dim);
+    font-family:'IBM Plex Mono',monospace; font-size:12px; padding:6px 12px;
+    border-radius:999px; cursor:pointer;
+  }
+  .quickwords button:hover{ border-color:var(--moss); color:var(--text); }
+
+  .btn-primary{
+    background:var(--gold); color:var(--ink-950); border:none; font-weight:600;
+    font-family:'Public Sans',sans-serif; font-size:14.5px; padding:13px 26px;
+    border-radius:999px; cursor:pointer;
+  }
+  .btn-primary:hover{ filter:brightness(1.08); }
+  .btn-primary:disabled{ opacity:0.35; cursor:not-allowed; }
+  .btn-ghost{
+    background:none; border:1px solid var(--line); color:var(--text-dim);
+    font-family:'IBM Plex Mono',monospace; font-size:12.5px; padding:10px 18px;
+    border-radius:999px; cursor:pointer;
+  }
+  .btn-ghost:hover{ color:var(--text); border-color:var(--text-dim); }
+
+  /* ---------- family grid ---------- */
+  .fam-header{ display:flex; align-items:baseline; gap:12px; margin-bottom:6px; flex-wrap:wrap;}
+  .fam-header h2{ font-family:'Fraunces',serif; font-size:30px; font-weight:500; margin:0;}
+  .fam-desc{ color:var(--text-dim); font-size:14.5px; max-width:560px; margin:8px 0 30px; line-height:1.6;}
+  .word-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  @media (max-width:640px){ .word-grid{ grid-template-columns:1fr; } }
+  .word-card{
+    text-align:left; background:var(--ink-800); border:1px solid var(--line);
+    padding:18px 20px; border-radius:5px; cursor:pointer; color:var(--text);
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .word-card:hover{ border-color:var(--berry); background:var(--ink-700); }
+  .word-card .w{ font-family:'Fraunces',serif; font-size:19px; font-weight:500; }
+  .word-card .d{ font-size:13px; color:var(--text-dim); margin-top:5px; line-height:1.5;}
+
+  /* ---------- specimen result ---------- */
+  .specimen{
+    background:var(--parchment); color:var(--on-paper); border-radius:6px;
+    padding:44px; position:relative; overflow:hidden; border:1px solid var(--parchment-dim);
+  }
+  .specimen::before{
+    content:""; position:absolute; inset:0; pointer-events:none; opacity:0.5;
+    background-image: repeating-linear-gradient(0deg, rgba(0,0,0,0.015) 0px, rgba(0,0,0,0.015) 1px, transparent 1px, transparent 3px);
+  }
+  .specimen-id{ font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--berry-dim); letter-spacing:0.06em; text-transform:uppercase;}
+  .specimen h2{ font-family:'Fraunces',serif; font-size:44px; font-weight:500; margin:8px 0 4px; }
+  .specimen .fam-tag{ font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--on-paper-dim); margin-bottom:22px; }
+  .specimen p.def{ font-size:17px; line-height:1.6; max-width:560px; margin:0 0 24px; }
+  .specimen .rule{ border:none; border-top:1px solid rgba(36,40,32,0.15); margin:24px 0; }
+  .specimen h4{
+    font-family:'IBM Plex Mono',monospace; font-size:11.5px; text-transform:uppercase;
+    letter-spacing:0.07em; color:var(--berry-dim); margin:0 0 10px;
+  }
+  .specimen .contrast{ font-size:14.5px; line-height:1.6; background:rgba(36,40,32,0.05); border-left:2px solid var(--berry); padding:12px 16px; border-radius:0 4px 4px 0; margin-bottom:24px;}
+  .chips{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:24px;}
+  .chip{ font-size:13px; background:rgba(36,40,32,0.08); padding:6px 12px; border-radius:999px;}
+  .why-box{ background:rgba(36,40,32,0.05); border-radius:5px; padding:18px 20px; font-size:14px; line-height:1.65; margin-bottom:24px;}
+  .prompts{ margin:0 0 24px; padding-left:0; list-style:none; }
+  .prompts li{ font-size:14.5px; line-height:1.6; padding:12px 0; border-top:1px solid rgba(36,40,32,0.12); }
+  .prompts li:first-child{ border-top:none; }
+  .actions{ font-size:14.5px; line-height:1.7; margin:0 0 8px; padding-left:20px;}
+  .specimen-foot{ display:flex; gap:12px; flex-wrap:wrap; margin-top:8px; }
+  .spec-btn{
+    font-family:'IBM Plex Mono',monospace; font-size:12px; background:var(--on-paper); color:var(--parchment);
+    border:none; padding:11px 18px; border-radius:999px; cursor:pointer;
+  }
+  .spec-btn.secondary{ background:none; border:1px solid rgba(36,40,32,0.3); color:var(--on-paper); }
+  .spec-btn:hover{ filter:brightness(1.15); }
+
+  /* ---------- recent log ---------- */
+  .recent{ margin-top:32px; }
+  .recent summary{ cursor:pointer; font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--mono); }
+  .recent-list{ margin-top:14px; display:flex; flex-direction:column; gap:8px; }
+  .recent-item{ font-size:13px; color:var(--text-dim); border:1px solid var(--line); border-radius:4px; padding:10px 14px; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;}
+  .recent-item b{ color:var(--text); font-weight:500; }
+
+  /* ---------- about page ---------- */
+  .about section{ margin-bottom:52px; }
+  .about h2{ font-family:'Fraunces',serif; font-size:26px; font-weight:500; margin:0 0 16px; }
+  .about h3{ font-family:'Fraunces',serif; font-size:18px; font-weight:500; margin:26px 0 10px; color:var(--parchment);}
+  .about p{ font-size:15px; line-height:1.75; color:var(--text-dim); margin:0 0 14px; max-width:680px;}
+  .about p b, .about li b{ color:var(--text); font-weight:600; }
+  .about ul{ padding-left:20px; margin:0 0 14px; max-width:680px; }
+  .about li{ font-size:15px; line-height:1.75; color:var(--text-dim); margin-bottom:6px;}
+  .cite{ font-size:12.5px; color:var(--mono); font-family:'IBM Plex Mono',monospace; border-left:2px solid var(--moss); padding-left:12px; margin:18px 0; line-height:1.7;}
+  .hero-about{ padding:8px 0 8px; }
+  .hero-about .eyebrow{ margin-bottom:18px; }
+  .hero-about h1{ font-family:'Fraunces',serif; font-size:38px; font-weight:500; line-height:1.25; margin:0 0 20px; max-width:640px;}
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+  @media (max-width:680px){ .grid2{ grid-template-columns:1fr; } }
+  .mini-card{ border:1px solid var(--line); border-radius:5px; padding:20px; background:var(--ink-900); }
+  .mini-card h4{ font-family:'IBM Plex Mono',monospace; font-size:11.5px; text-transform:uppercase; letter-spacing:0.06em; color:var(--gold); margin:0 0 10px;}
+  .mini-card p{ font-size:13.5px; margin:0; color:var(--text-dim); }
+  .disclaimer{
+    margin-top:60px; padding:20px 24px; border:1px solid var(--line); border-radius:5px;
+    font-size:12.5px; color:var(--mono); line-height:1.7; background:var(--ink-900);
+  }
+
+  footer.page-foot{ text-align:center; color:var(--mono); font-size:11.5px; font-family:'IBM Plex Mono',monospace; margin-top:60px; }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="top">
+    <div class="brand">
+      <span class="mark">◎</span>
+      <div>
+        <h1>Field Key to Feeling</h1>
+        <div class="sub">an emotional vocabulary expander</div>
+      </div>
+    </div>
+    <nav class="tabs">
+      <button id="tab-tool" class="active" onclick="setView('tool')">Identify</button>
+      <button id="tab-about" onclick="setView('about')">The Method</button>
+      <button id="tab-thinking" onclick="setView('thinking')">Thinking Logic</button>
+    </nav>
+  </header>
+
+  <div id="app"></div>
+
+  <footer class="page-foot">FIELD KEY TO FEELING — a portfolio project in applied psychology &amp; product design</footer>
+</div>
+
+<script>
+/* =========================================================
+   DATA
+   ========================================================= */
+const FAMILIES = {
+  anger: {
+    code: "FAM.01", name: "Anger", tone: "unpleasant · activated · pushing outward",
+    desc: "Anger shows up when something blocks a goal, crosses a boundary, or feels unfair. It mobilizes you to push back. It's rarely one thing — these six words split it by intensity and target.",
+    emotions: [
+      { id:"frustration", name:"Frustration", def:"Anger that flares when effort isn't producing the result you expect — a blocked goal, not a blocked self.",
+        body:["tight jaw","shallow breath","urge to grip or slam something"],
+        contrast:"Frustration is aimed at a task or obstacle. If it's aimed at a person and has a moral charge, that's closer to indignation.",
+        prompts:["What exactly is the goal that's being blocked right now?","If the obstacle vanished in the next ten minutes, what would you do first?"],
+        actions:["Name the specific blocker out loud, not just 'this is annoying' — precision often lowers the charge on its own.","Take one small, concrete action toward the goal, even a partial one."] },
+      { id:"irritation", name:"Irritation", def:"A low-grade, repeated friction — smaller than anger, but it accumulates when it isn't named.",
+        body:["restlessness","short temper","tension in shoulders"],
+        contrast:"Irritation is anger's quiet, chronic cousin. If it's building toward something you've held in for a long time, look at resentment instead.",
+        prompts:["Is this about the last five minutes, or the last five days?","What's the smallest repeated thing that keeps triggering this?"],
+        actions:["Track the trigger for 24 hours before reacting to it — patterns are more informative than single incidents.","Address the recurring source directly rather than the moment it last happened."] },
+      { id:"resentment", name:"Resentment", def:"Anger that's been swallowed rather than expressed, usually mixed with a sense of powerlessness or unfairness over time.",
+        body:["heaviness in the chest","clenched stomach","replaying old scenes"],
+        contrast:"Resentment has a history — it's not about today's event, it's about an accumulated one. Fresh, single-incident anger is closer to indignation or frustration.",
+        prompts:["What did you not say, to whom, and when did it start?","What would 'even' look like in this situation?"],
+        actions:["Write the unsent version of what you'd say — get it out of your body and onto a page before deciding whether to say it out loud.","Identify one boundary you could set going forward, rather than re-litigating the past."] },
+      { id:"indignation", name:"Indignation", def:"Anger with a moral edge — a response to unfairness done to you or someone else, not just an inconvenience.",
+        body:["heat rising in the chest or face","urge to speak up","straightened posture"],
+        contrast:"Indignation carries a 'this isn't right' judgment. Without that moral charge, it's more likely frustration.",
+        prompts:["What rule or value feels like it's been violated?","Whose responsibility is it to address this, and is that you?"],
+        actions:["Separate the principle from the person — decide what you're actually asking to change.","If it's not your fight to fight today, name that consciously so it doesn't quietly become resentment."] },
+      { id:"contempt", name:"Contempt", def:"Anger fused with a sense of superiority — a dismissal of the other person, not just their behavior.",
+        body:["one-sided smirk or eye-roll impulse","cold rather than hot","distancing"],
+        contrast:"Contempt looks down; indignation looks across. If you still see the other person as an equal who did wrong, it's indignation, not contempt.",
+        prompts:["What would it mean to still see this person as someone doing their best, even if the behavior isn't okay?","Is there a boundary underneath this that hasn't been stated?"],
+        actions:["Contempt is one of the strongest predictors of relationship breakdown in research on couples — if it's aimed at someone you want to stay close to, address it directly rather than let it settle in.","State the specific behavior that crossed a line, separate from a verdict on their character."] },
+      { id:"rage", name:"Rage", def:"Anger that has outpaced thinking — the body's alarm system overriding deliberate response.",
+        body:["heat, shaking, tunnel vision","racing heart","urge toward big, fast action"],
+        contrast:"Rage has lost the ability to reflect mid-feeling; frustration and indignation still leave room to think while feeling them.",
+        prompts:["What would help your body come down by 20% right now, before any decision gets made?","What is this protecting — a boundary, a person, your dignity?"],
+        actions:["Create physical distance from the trigger before speaking or acting — minutes, not seconds.","Once the spike passes, revisit which earlier, calmer word (frustration, indignation, resentment) this was actually built on."] }
+    ]
+  },
+  fear: {
+    code: "FAM.02", name: "Fear & Anxiety", tone: "unpleasant · activated · pulling back",
+    desc: "This family activates the body to protect you from a threat — real, anticipated, or imagined. The words below split by how certain, how close, and how specific the threat feels.",
+    emotions: [
+      { id:"anxiety", name:"Anxiety", def:"A diffuse, future-oriented unease without a single clear object — a sense that something might go wrong.",
+        body:["restless energy","tight chest","racing or looping thoughts"],
+        contrast:"Anxiety is broad and object-less. If it locks onto one specific possible outcome, that's worry.",
+        prompts:["If you had to guess, what's the 'something' this is about?","What's within your control in the next hour, versus not?"],
+        actions:["Externalize it — write down every version of 'what if' until the list runs dry; vague anxiety shrinks when it's made specific.","Do one grounding action (feet on the floor, slow exhale) before trying to problem-solve."] },
+      { id:"worry", name:"Worry", def:"A repetitive anxious thought loop focused on one specific possible outcome.",
+        body:["mental repetition","tension in the stomach","difficulty focusing on anything else"],
+        contrast:"Worry is anxiety with a specific storyline attached. Strip the storyline away and what's left is often plain anxiety.",
+        prompts:["What's the worst-case version of this, stated plainly?","What's one piece of information that would actually change your next move?"],
+        actions:["Set a 'worry window' — 10 minutes to think it through fully, then close it and return to the day.","Separate what you can act on now from what only time or someone else can resolve."] },
+      { id:"dread", name:"Dread", def:"Anxiety about something approaching that feels certain or unavoidable, rather than merely possible.",
+        body:["heaviness","a sinking feeling","reluctance to look ahead at the calendar"],
+        contrast:"Dread is about certainty — the thing is coming. Worry is still about possibility.",
+        prompts:["What specifically is approaching, and when?","What's one way to make the approach itself more bearable, even if the event can't change?"],
+        actions:["Break the approaching event into smaller, scheduled steps rather than one large looming block.","Plan something small and good on the other side of it, to give the timeline a landing point."] },
+      { id:"overwhelm", name:"Overwhelm", def:"The feeling of too much input or demand relative to your current capacity — not one threat, but volume itself.",
+        body:["scattered attention","shallow breathing","urge to shut down or freeze"],
+        contrast:"Overwhelm is about quantity and capacity. Anxiety can exist with plenty of capacity left — overwhelm specifically means the tank feels empty.",
+        prompts:["If you could only do one thing today, what would it be?","What's currently on your plate that isn't actually yours to carry?"],
+        actions:["Write every open item down, then cut the list to three — the rest waits.","Ask for one specific piece of help rather than trying to signal 'everything is a lot.'"] },
+      { id:"nervousness", name:"Nervousness", def:"Anticipatory activation before a specific, identifiable event — often performance or evaluation related.",
+        body:["butterflies","fidgeting","dry mouth"],
+        contrast:"Nervousness has a clear start and end time tied to an event. Anxiety often has no clear edges.",
+        prompts:["What does 'going well' actually look like here?","What have you already prepared that you can remind yourself of?"],
+        actions:["Reframe the activation as readiness rather than danger — the body's signal is similar for both.","Do a short physical reset (walk, stretch, slow breathing) in the ten minutes before."] },
+      { id:"panic", name:"Panic", def:"Fear spiking suddenly and intensely — the body's alarm system firing at full volume, often faster than the situation warrants.",
+        body:["racing heart","shortness of breath","dizziness or a feeling of unreality"],
+        contrast:"Panic is sudden and intense; dread builds slowly toward something you can already see coming.",
+        prompts:["Can you name five things you can currently see, to bring attention back to the room?","Has this happened before, and what helped it pass last time?"],
+        actions:["Slow the exhale longer than the inhale — this directly signals the nervous system to downshift.","If panic is frequent or escalating, this is worth bringing to a doctor or therapist rather than managing alone."] }
+    ]
+  },
+  sadness: {
+    code: "FAM.03", name: "Sadness", tone: "unpleasant · low energy · loss or lack",
+    desc: "Sadness responds to loss, absence, or things not going as hoped. It tends to slow you down rather than activate you — its job is to signal that something mattered.",
+    emotions: [
+      { id:"disappointment", name:"Disappointment", def:"Sadness that arrives when an outcome doesn't match what you hoped for or expected.",
+        body:["a dip or drop in the chest","low motivation","quietness"],
+        contrast:"Disappointment is tied to a specific expected outcome. If motivation stays low across many attempts, that drifts toward discouragement.",
+        prompts:["What exactly were you hoping would happen?","Is there a smaller version of that hope still available?"],
+        actions:["Let the letdown register for a few minutes before jumping to 'it's fine' — naming it shortens it, suppressing it extends it.","Decide if this is worth trying again, or worth genuinely letting go."] },
+      { id:"loneliness", name:"Loneliness", def:"The felt absence of connection — not necessarily being alone, but wanting contact that isn't currently there.",
+        body:["a hollow feeling","heaviness","craving conversation or touch"],
+        contrast:"Loneliness is about the gap between wanted and actual connection. You can feel it in a crowded room, or not feel it while physically alone.",
+        prompts:["Who is one person you'd genuinely like to hear from right now?","What kind of connection is missing — company, being understood, being needed?"],
+        actions:["Reach out to one specific person with one specific, low-stakes message.","If reaching out feels too hard right now, choose a low-effort way to be around others (a public space, a call you don't have to lead)."] },
+      { id:"hurt", name:"Hurt", def:"Pain caused specifically by another person's words or actions — a relational injury.",
+        body:["a stinging or ache, often chest or stomach","withdrawal","replaying what was said"],
+        contrast:"Hurt is caused by someone else's specific action. Disappointment is usually about outcomes, not about being wounded by a person.",
+        prompts:["What was said or done, in the most literal terms you can manage?","What would you need to hear from that person for this to start easing?"],
+        actions:["Name the specific behavior, not a character verdict, if you choose to raise it with them.","Give yourself the same care you'd offer a friend who told you this happened to them."] },
+      { id:"grief", name:"Grief", def:"Sadness in response to the loss of someone or something significant — a relationship, a role, a version of the future.",
+        body:["waves rather than a steady state","fatigue","a lump in the throat"],
+        contrast:"Grief is tied to a real loss and tends to come in waves over time, unlike the more situational, faster-passing sadness of disappointment.",
+        prompts:["What specifically is gone that mattered to you?","Is there a small way to acknowledge that loss today, rather than around it?"],
+        actions:["Let the wave move through rather than fighting it — grief that's expressed tends to move; grief that's blocked tends to store.","If it's persistent and affecting daily functioning, a grief-informed therapist can help; this is not something you have to carry alone."] },
+      { id:"discouragement", name:"Discouragement", def:"Motivation drained after one or more setbacks — the sense that effort isn't paying off.",
+        body:["low energy","reluctance to start tasks","a flatter voice or posture"],
+        contrast:"Discouragement is about depleted motivation after repeated effort. A single unmet hope is closer to plain disappointment.",
+        prompts:["What have you tried, and what pattern do you notice across the attempts?","What's the smallest next step that doesn't require full motivation to start?"],
+        actions:["Lower the bar for the next attempt on purpose — small and done beats large and abandoned.","Talk to someone who's seen your effort, not just the outcome."] },
+      { id:"hopelessness", name:"Hopelessness", def:"A belief that things won't improve — the future feels closed rather than simply disappointing.",
+        body:["heaviness that doesn't lift","withdrawal from plans","fatigue"],
+        contrast:"Hopelessness extends into the future ('this won't change'). Discouragement is usually about the present effort, not a verdict on what's possible.",
+        prompts:["Is this feeling speaking about right now, or making a prediction about all future attempts?","Who or what has helped shift a stuck period before, even slightly?"],
+        actions:["Treat this as information to share with someone you trust or a professional, rather than a fact to act on alone — persistent hopelessness is one of the clearest signals it's time for outside support.","If it's ever accompanied by thoughts of not wanting to be here, that's a reason to reach out for help right away, not a reason to wait it out."] }
+    ]
+  },
+  shame: {
+    code: "FAM.04", name: "Shame & Guilt", tone: "unpleasant · low-mid energy · self-directed",
+    desc: "This family turns attention inward, toward the self rather than the world. It ranges from a specific behavior you regret to a global sense of not being enough.",
+    emotions: [
+      { id:"guilt", name:"Guilt", def:"The sense that you did something wrong — focused on a specific behavior, not your whole self.",
+        body:["a knot in the stomach","urge to apologize or fix","replaying the moment"],
+        contrast:"Guilt says 'I did a bad thing.' Shame says 'I am bad.' The target — action versus identity — is the key difference.",
+        prompts:["What specifically did you do, or fail to do?","What would a genuine repair look like, even a small one?"],
+        actions:["Make the repair concrete and specific rather than a vague apology.","Once the repair is made or offered, practice letting the guilt close rather than replaying it indefinitely."] },
+      { id:"shame", name:"Shame", def:"A global sense that something is wrong with you as a person, not just with something you did.",
+        body:["urge to hide or disappear","heat in the face","avoiding eye contact, even in memory"],
+        contrast:"Shame is about identity ('I am'), guilt is about behavior ('I did'). Separating the two is often the single most useful move in this family.",
+        prompts:["If a friend did exactly what you did, would you say the same thing about them as a person?","What's one piece of evidence against the global verdict shame is making?"],
+        actions:["Translate the shame sentence from 'I am ___' back into 'I did ___' — this alone often reduces its intensity.","Say the specific thing to one trusted person; shame tends to lose power when spoken aloud and met with acceptance."] },
+      { id:"embarrassment", name:"Embarrassment", def:"A smaller, more public cousin of shame — exposure in front of others over something lower-stakes.",
+        body:["flushing","nervous laughter","wanting the moment to end quickly"],
+        contrast:"Embarrassment is lighter and passes faster than shame, and is usually about a moment rather than a verdict on your character.",
+        prompts:["Will this matter in a week? In a year?","What's the most generous read someone watching might have had?"],
+        actions:["Name it lightly out loud if the moment allows ('well, that was awkward') — this often dissolves it faster than pretending it didn't happen.","Let it pass without turning it into evidence for a bigger story about yourself."] },
+      { id:"regret", name:"Regret", def:"Wishing a past choice had gone differently — oriented toward what could have been.",
+        body:["a dull, lingering ache","mental replaying of alternatives","sighing"],
+        contrast:"Regret is about a decision point in the past. Guilt is about the impact of what you did; regret is about the choice itself, even if no one else was harmed.",
+        prompts:["What did you know at the time you made that choice — not what you know now?","What would you do differently if a similar choice came up again?"],
+        actions:["Extract the one useful lesson and let the rest of the replaying go.","Judge the past decision by the information available then, not by hindsight."] },
+      { id:"inadequacy", name:"Inadequacy", def:"The sense of not measuring up to a standard — yours, someone else's, or an implied one.",
+        body:["a sinking sense in the chest","comparing yourself to others","urge to withdraw from the task"],
+        contrast:"Inadequacy is about falling short of a standard. Shame is broader and doesn't need a specific standard to attach to.",
+        prompts:["Whose standard is this, exactly, and did you choose it?","What would 'good enough' look like here, concretely?"],
+        actions:["Write the standard down explicitly — vague standards are impossible to meet by design.","Compare yourself to your own past attempt, not to someone else's current one."] },
+      { id:"selfconsciousness", name:"Self-consciousness", def:"A heightened awareness of being observed or judged, often disproportionate to how much attention is actually on you.",
+        body:["hyperawareness of your own movements or voice","tension","overthinking how you're coming across"],
+        contrast:"Self-consciousness is about perceived observation in the moment. Embarrassment is a reaction to something that already happened.",
+        prompts:["How much of your attention is on the room, versus on yourself right now?","What would you be doing differently if no one at all were watching?"],
+        actions:["Redirect attention outward on purpose — ask a question, notice something in the room, focus on the task instead of the audience.","Remember that most people are tracking their own self-consciousness far more than they're tracking yours."] }
+    ]
+  },
+  joy: {
+    code: "FAM.05", name: "Joy & Excitement", tone: "pleasant · activated",
+    desc: "This family energizes and opens you up. Naming the specific flavor helps you notice what's actually working — useful information, not just a nice feeling to enjoy and forget.",
+    emotions: [
+      { id:"excitement", name:"Excitement", def:"Energized anticipation of something good that hasn't happened yet.",
+        body:["quickened heartbeat","restlessness","a lightness or buzz"],
+        contrast:"Excitement is future-facing. Joy is more present-tense — about something happening now, not something coming.",
+        prompts:["What specifically are you looking forward to?","What would make the lead-up itself more enjoyable, not just the destination?"],
+        actions:["Tell someone — sharing anticipation tends to amplify it in a good way.","Do one small thing now that connects to the thing you're excited about."] },
+      { id:"joy", name:"Joy", def:"A full, present sense of happiness — here, now, not waiting on anything.",
+        body:["lightness","warmth","an urge to smile or laugh"],
+        contrast:"Joy is present-tense and complete in itself. Excitement is still leaning forward toward something.",
+        prompts:["What specifically made this moment good?","Who would you want to share this with?"],
+        actions:["Pause and actually let it register for a few seconds — savoring measurably extends positive states.","Note what led here, so you can recognize the path back to it later."] },
+      { id:"pride", name:"Pride", def:"Satisfaction rooted in your own achievement, effort, or character.",
+        body:["straightened posture","warmth in the chest","wanting to tell someone"],
+        contrast:"Pride is specifically about your own agency or character. Joy can come from anywhere; pride is self-attributed.",
+        prompts:["What did you actually do to get here — name the effort, not just the outcome.","Who else contributed, and have you acknowledged that too?"],
+        actions:["Write down what you did, specifically — this becomes useful evidence for harder days later.","Let yourself say it out loud to someone, without immediately minimizing it."] },
+      { id:"relief", name:"Relief", def:"The release of tension after a threat, worry, or uncertainty resolves.",
+        body:["an exhale, often literal","muscles loosening","sudden tiredness"],
+        contrast:"Relief specifically follows the end of something stressful. Contentment doesn't require a prior tension to release.",
+        prompts:["What was the tension that just resolved?","What do you need right now — rest, or momentum?"],
+        actions:["Let your body actually rest for a few minutes rather than immediately moving to the next task.","Note what helped resolve it, for next time something similar comes up."] },
+      { id:"gratitude", name:"Gratitude", def:"Appreciation for something you received — from a person, circumstance, or moment.",
+        body:["warmth","a softening in the chest","an urge to acknowledge someone"],
+        contrast:"Gratitude is directed — it has a source. Joy can be sourceless; gratitude is always about something or someone specific.",
+        prompts:["What specifically are you appreciating, and from whom or what did it come?","Is there a way to let that source know?"],
+        actions:["Say it directly to the person or write it down — expressed gratitude tends to land more than felt-but-unspoken gratitude.","Notice one small thing today you'd normally take for granted."] },
+      { id:"amusement", name:"Amusement", def:"A light, humor-triggered pleasure — the feeling behind laughing at something.",
+        body:["laughter or a smile","a lightness in the chest","relaxed shoulders"],
+        contrast:"Amusement is specifically triggered by something funny or absurd. Joy is broader and doesn't require humor.",
+        prompts:["What made this funny to you, specifically?","Who would appreciate this the way you just did?"],
+        actions:["Share it — amusement multiplies when it's passed along.","Let yourself enjoy it without immediately explaining or justifying why it's funny."] }
+    ]
+  },
+  calm: {
+    code: "FAM.06", name: "Calm & Contentment", tone: "pleasant · low energy",
+    desc: "This family is quiet by design — not the absence of feeling, but a settled, low-arousal kind of good. Easy to overlook, worth naming anyway.",
+    emotions: [
+      { id:"contentment", name:"Contentment", def:"A quiet satisfaction with things as they currently are — no urge to change anything right now.",
+        body:["relaxed muscles","slow, easy breathing","stillness"],
+        contrast:"Contentment is about accepting the present as sufficient. Joy is more animated; contentment is quieter and steadier.",
+        prompts:["What specifically feels 'enough' right now?","What conditions made this moment possible?"],
+        actions:["Let it be unremarkable — contentment doesn't need to be turned into a bigger event to count.","Note the conditions, so you can recreate them intentionally later."] },
+      { id:"peace", name:"Peace", def:"A settled state, often following the absence of internal conflict rather than the presence of anything in particular.",
+        body:["slow breath","loose shoulders","quiet mind"],
+        contrast:"Peace is about internal quiet — the absence of conflict. Contentment is more about satisfaction with external circumstances.",
+        prompts:["What conflict, if any, recently resolved or quieted?","What does your mind feel free of right now?"],
+        actions:["Resist the urge to immediately fill the quiet with a new task.","Notice what allowed this state, so you can protect it going forward."] },
+      { id:"comfort", name:"Comfort", def:"Ease, safety, and familiarity — the feeling of being somewhere or with someone that requires no effort.",
+        body:["relaxed posture","warmth","a settled stomach"],
+        contrast:"Comfort is tied to safety and familiarity specifically. Peace can happen even in unfamiliar settings, once internal conflict quiets.",
+        prompts:["What specifically is making this feel safe or familiar right now?","Is this a place, a person, or a routine?"],
+        actions:["Name the source of comfort so you can return to it deliberately when you need it.","Let it be simple — comfort doesn't need justification."] },
+      { id:"serenity", name:"Serenity", def:"A calm that persists even with some activity or minor disturbance happening around you.",
+        body:["steady breathing despite surroundings","an unhurried pace","clear thinking"],
+        contrast:"Serenity holds up under mild disturbance. Peace and comfort are more dependent on calm, protected surroundings.",
+        prompts:["What's happening around you right now that this calm is holding steady through?","What practice or habit built this capacity?"],
+        actions:["Notice what's letting you stay steady — that's a transferable skill worth naming.","Protect the routine or practice that built it."] },
+      { id:"trust", name:"Trust", def:"A sense of security in a relationship, system, or situation — a belief that it will hold.",
+        body:["relaxed shoulders","openness in posture","less vigilance than usual"],
+        contrast:"Trust is specifically relational or situational — it's about reliance on something or someone. Contentment doesn't require relying on anything external.",
+        prompts:["What has this person or situation done to earn this sense of reliability?","Is there a part of you still holding back slightly, and why?"],
+        actions:["Acknowledge the trust to the person involved, if it's relational — it tends to reinforce itself when named.","Notice the specific evidence behind it, so it's grounded rather than assumed."] },
+      { id:"curiosity", name:"Curiosity", def:"Open, low-stakes interest — a pull toward something without urgency or threat attached.",
+        body:["leaning in, mentally or physically","alertness without tension","a wandering, exploratory attention"],
+        contrast:"Curiosity is engaged and open. Contentment is settled and doesn't reach toward anything new.",
+        prompts:["What specifically is pulling your attention right now?","What would it cost to actually follow it for ten minutes?"],
+        actions:["Follow it for a short, defined window without needing a reason.","Write down the question it's raising, even if you don't chase it immediately."] }
+    ]
+  }
+};
+
+const QUICKWORDS = ["bad","off","weird","meh","stressed","numb","good","fine","heavy","tense"];
+
+/* =========================================================
+   STATE
+   ========================================================= */
+let state = { stage:"input", vague:"", valence:null, arousal:null, focus:null, familyId:null };
+let view = "tool";
+
+function reset(){ state = { stage:"input", vague:"", valence:null, arousal:null, focus:null, familyId:null }; render(); }
+
+function setView(v){
+  view = v;
+  document.getElementById("tab-tool").classList.toggle("active", v==="tool");
+  document.getElementById("tab-about").classList.toggle("active", v==="about");
+  document.getElementById("tab-thinking").classList.toggle("active", v==="thinking");
+  render();
+}
+
+/* =========================================================
+   LOG (session-only, localStorage)
+   ========================================================= */
+function getLog(){ try{ return JSON.parse(localStorage.getItem("fkf_log")||"[]"); }catch(e){ return []; } }
+function saveToLog(entry){
+  const log = getLog();
+  log.unshift(entry);
+  localStorage.setItem("fkf_log", JSON.stringify(log.slice(0,10)));
+}
+
+/* =========================================================
+   RENDER
+   ========================================================= */
+function render(){
+  const app = document.getElementById("app");
+  app.innerHTML = "";
+  if(view === "about"){ app.appendChild(renderAbout()); return; }
+  if(view === "thinking"){ app.appendChild(renderThinking()); return; }
+
+  app.appendChild(renderTrail());
+
+  if(state.stage === "input") app.appendChild(renderInput());
+  else if(state.stage === "q1") app.appendChild(renderQ1());
+  else if(state.stage === "q2") app.appendChild(renderQ2());
+  else if(state.stage === "q3") app.appendChild(renderQ3());
+  else if(state.stage === "family") app.appendChild(renderFamily());
+  else if(state.stage === "result") app.appendChild(renderResult());
+}
+
+function el(tag, cls, html){ const e = document.createElement(tag); if(cls) e.className = cls; if(html!==undefined) e.innerHTML = html; return e; }
+
+function renderTrail(){
+  const wrap = el("div","trail");
+  const bits = [];
+  if(state.vague) bits.push(`word <b>“${escapeHtml(state.vague)}”</b>`);
+  if(state.valence) bits.push(`<b>${state.valence}</b>`);
+  if(state.arousal) bits.push(`<b>${state.arousal === 'activated' ? 'activated' : 'low-energy'}</b>`);
+  if(state.familyId) bits.push(`<b>${FAMILIES[state.familyId].name}</b>`);
+  if(bits.length === 0){ wrap.innerHTML = ""; return wrap; }
+  bits.forEach(b=>{ const t = el("span","tag", b); wrap.appendChild(t); });
+  return wrap;
+}
+
+function renderInput(){
+  const c = el("div","card");
+  c.appendChild(el("p","eyebrow","STEP 01 — START WITH WHAT YOU'VE GOT"));
+  c.appendChild(el("h2","q","What's the word you'd reach for right now, even if it's a vague one?"));
+  const input = el("input","word-input");
+  input.placeholder = "bad, off, stressed, fine, meh...";
+  input.value = state.vague;
+  input.id = "vague-input";
+  c.appendChild(input);
+
+  const qw = el("div","quickwords");
+  QUICKWORDS.forEach(w=>{
+    const b = document.createElement("button");
+    b.textContent = w;
+    b.onclick = ()=>{ document.getElementById("vague-input").value = w; };
+    qw.appendChild(b);
+  });
+  c.appendChild(qw);
+
+  const btn = el("button","btn-primary","Start identifying →");
+  btn.onclick = ()=>{
+    state.vague = document.getElementById("vague-input").value.trim() || "this feeling";
+    state.stage = "q1";
+    render();
+  };
+  c.appendChild(btn);
+  return c;
+}
+
+function renderQ1(){
+  const c = el("div","card");
+  c.appendChild(el("p","eyebrow","STEP 02 — VALENCE"));
+  c.appendChild(el("h2","q", `Sit with “${escapeHtml(state.vague)}” for a second. Is it more unpleasant to feel, or more pleasant?`));
+  const grid = el("div","choice-grid");
+  grid.appendChild(makeChoice("Unpleasant", "Tension, heaviness, something you'd rather not feel", ()=>{ state.valence="unpleasant"; state.stage="q2"; render(); }));
+  grid.appendChild(makeChoice("Pleasant", "Ease, warmth, something you'd want more of", ()=>{ state.valence="pleasant"; state.stage="q2"; render(); }));
+  c.appendChild(grid);
+  c.appendChild(el("p","helper","If it's genuinely mixed, go with whichever is loudest right now — you can always come back and identify the other part separately."));
+  return c;
+}
+
+function renderQ2(){
+  const c = el("div","card");
+  c.appendChild(el("p","eyebrow","STEP 03 — AROUSAL"));
+  c.appendChild(el("h2","q","Now check your body. Is it more wound up, or more heavy and still?"));
+  const grid = el("div","choice-grid");
+  grid.appendChild(makeChoice("Wound up", "Heart rate up, restless, tense, activated", ()=>{ state.arousal="activated"; nextAfterQ2(); }));
+  grid.appendChild(makeChoice("Heavy or still", "Low energy, drained, flat, slowed down", ()=>{ state.arousal="low"; nextAfterQ2(); }));
+  c.appendChild(grid);
+  return c;
+}
+
+function nextAfterQ2(){
+  if(state.valence === "pleasant"){
+    state.familyId = state.arousal === "activated" ? "joy" : "calm";
+    state.stage = "family";
+  } else {
+    state.stage = "q3";
+  }
+  render();
+}
+
+function renderQ3(){
+  const c = el("div","card");
+  c.appendChild(el("p","eyebrow","STEP 04 — DIRECTION"));
+  if(state.arousal === "activated"){
+    c.appendChild(el("h2","q","One more. Do you want to push against something, or pull back and protect yourself?"));
+    const grid = el("div","choice-grid");
+    grid.appendChild(makeChoice("Push against it", "There's an obstacle, a person, or an unfairness to confront", ()=>{ state.focus="push"; state.familyId="anger"; state.stage="family"; render(); }));
+    grid.appendChild(makeChoice("Pull back / brace", "There's a threat, uncertainty, or something to guard against", ()=>{ state.focus="pull"; state.familyId="fear"; state.stage="family"; render(); }));
+    c.appendChild(grid);
+  } else {
+    c.appendChild(el("h2","q","Is this more about something missing or lost, or more about yourself?"));
+    const grid = el("div","choice-grid");
+    grid.appendChild(makeChoice("Something missing or lost", "A person, an outcome, a connection, a hope", ()=>{ state.focus="loss"; state.familyId="sadness"; state.stage="family"; render(); }));
+    grid.appendChild(makeChoice("Something about myself", "A choice, a mistake, a way you feel you fall short", ()=>{ state.focus="self"; state.familyId="shame"; state.stage="family"; render(); }));
+    c.appendChild(grid);
+  }
+  return c;
+}
+
+function makeChoice(title, sub, onClick){
+  const b = document.createElement("button");
+  b.className = "choice";
+  b.innerHTML = `${title}<small>${sub}</small>`;
+  b.onclick = onClick;
+  return b;
+}
+
+function renderFamily(){
+  const fam = FAMILIES[state.familyId];
+  const c = el("div","card");
+  c.appendChild(el("p","eyebrow", `${fam.code} — ${fam.tone.toUpperCase()}`));
+  const fh = el("div","fam-header");
+  fh.appendChild(el("h2","","")); // placeholder for structure, replaced below
+  c.appendChild(el("div","", `<div class="fam-header"><h2>${fam.name}</h2></div>`));
+  c.appendChild(el("p","fam-desc", fam.desc));
+  const grid = el("div","word-grid");
+  fam.emotions.forEach(em=>{
+    const card = document.createElement("button");
+    card.className = "word-card";
+    card.innerHTML = `<div class="w">${em.name}</div><div class="d">${em.def}</div>`;
+    card.onclick = ()=>{ state.emotionId = em.id; state.stage = "result"; render(); window.scrollTo({top:0, behavior:"smooth"}); };
+    grid.appendChild(card);
+  });
+  c.appendChild(grid);
+
+  const back = el("button","btn-ghost","← Start over");
+  back.style.marginTop = "26px";
+  back.onclick = reset;
+  c.appendChild(back);
+  return c;
+}
+
+function renderResult(){
+  const fam = FAMILIES[state.familyId];
+  const idx = fam.emotions.findIndex(e=>e.id===state.emotionId);
+  const em = fam.emotions[idx];
+
+  const wrap = document.createElement("div");
+
+  const spec = el("div","specimen");
+  spec.appendChild(el("div","specimen-id", `${fam.code}.${String(idx+1).padStart(2,"0")} — ${fam.name.toUpperCase()}`));
+  spec.appendChild(el("h2","", em.name));
+  spec.appendChild(el("div","fam-tag", `from “${escapeHtml(state.vague)}” → ${state.valence}, ${state.arousal==='activated'?'activated':'low-energy'} → ${fam.name.toLowerCase()}`));
+  spec.appendChild(el("p","def", em.def));
+
+  spec.appendChild(el("h4","","COMPARE"));
+  spec.appendChild(el("div","contrast", em.contrast));
+
+  spec.appendChild(el("h4","","OFTEN FELT AS"));
+  const chips = el("div","chips");
+  em.body.forEach(b=>chips.appendChild(el("span","chip", b)));
+  spec.appendChild(chips);
+
+  spec.appendChild(el("h4","","WHY NAMING THIS MATTERS"));
+  spec.appendChild(el("div","why-box",
+    `Research on <b>affect labeling</b> — the practice of putting a feeling into a specific word — shows it measurably lowers activity in the brain's threat-response circuitry (Lieberman et al., 2007). The more precisely you can name what you feel, the less it tends to run the show unnoticed. Calling this <b>${em.name.toLowerCase()}</b> instead of just “${escapeHtml(state.vague)}” is doing real regulatory work, not just semantics.`
+  ));
+
+  spec.appendChild(el("h4","","TWO QUESTIONS TO SIT WITH"));
+  const pr = el("ul","prompts");
+  em.prompts.forEach(p=>pr.appendChild(el("li","", p)));
+  spec.appendChild(pr);
+
+  spec.appendChild(el("h4","","SOMETHING TO DO WITH IT"));
+  const ac = el("ul","actions");
+  em.actions.forEach(a=>ac.appendChild(el("li","", a)));
+  spec.appendChild(ac);
+
+  const foot = el("div","specimen-foot");
+  const back = document.createElement("button");
+  back.className = "spec-btn secondary";
+  back.textContent = `← Not quite — other ${fam.name.toLowerCase()} words`;
+  back.onclick = ()=>{ state.stage = "family"; render(); };
+  const save = document.createElement("button");
+  save.className = "spec-btn";
+  save.textContent = "Save this entry";
+  save.onclick = ()=>{
+    saveToLog({ date: new Date().toLocaleDateString(), vague: state.vague, family: fam.name, emotion: em.name });
+    save.textContent = "Saved ✓";
+    setTimeout(render, 700);
+  };
+  const restart = document.createElement("button");
+  restart.className = "spec-btn secondary";
+  restart.textContent = "Start over";
+  restart.onclick = reset;
+  foot.appendChild(back); foot.appendChild(save); foot.appendChild(restart);
+  spec.appendChild(foot);
+
+  wrap.appendChild(spec);
+  wrap.appendChild(renderRecent());
+  return wrap;
+}
+
+function renderRecent(){
+  const log = getLog();
+  const details = document.createElement("details");
+  details.className = "recent";
+  const summary = document.createElement("summary");
+  summary.textContent = `Your recent entries (${log.length}, saved only in this browser)`;
+  details.appendChild(summary);
+  const list = el("div","recent-list");
+  if(log.length === 0){
+    list.appendChild(el("div","recent-item","Nothing saved yet."));
+  } else {
+    log.forEach(item=>{
+      list.appendChild(el("div","recent-item", `<span>“${escapeHtml(item.vague)}” → <b>${item.emotion}</b> <span style="color:var(--mono)">(${item.family})</span></span><span>${item.date}</span>`));
+    });
+  }
+  details.appendChild(list);
+  return details;
+}
+
+/* =========================================================
+   ABOUT PAGE
+   ========================================================= */
+function renderAbout(){
+  const wrap = el("div","about");
+
+  const hero = el("div","hero-about");
+  hero.appendChild(el("p","eyebrow","THE METHOD"));
+  hero.appendChild(el("h1","","Why a more precise feeling word does real psychological work"));
+  hero.appendChild(el("p","","Most of us reach for a handful of words — good, bad, fine, stressed — to cover a much wider range of internal states. Research on emotional granularity suggests that gap has consequences, and that closing it is a learnable skill, not a fixed trait."));
+  wrap.appendChild(hero);
+
+  const s1 = el("section","");
+  s1.appendChild(el("h2","","The research behind it"));
+  s1.appendChild(el("p","","People vary in how precisely they can identify and describe what they're feeling — a capacity researchers call <b>emotional granularity</b> or <b>emotional differentiation</b>. At one end of that spectrum sits <b>alexithymia</b>, a marked difficulty identifying and describing one's own emotions. Lower granularity has been associated with poorer emotion regulation and worse mental health outcomes across a number of studies; higher granularity tends to go along with more flexible coping and lower rates of depression and anxiety."));
+  s1.appendChild(el("p","","The mechanism most directly relevant to this tool is <b>affect labeling</b>: the simple act of putting a feeling into words. In a widely cited fMRI study, Lieberman and colleagues found that labeling an emotional facial expression with a word reduced activity in the amygdala — the brain region central to threat response — compared to just viewing the expression. A related study by Kircanski and colleagues found that people with a spider phobia who used specific, granular language while approaching a spider (rather than distracting themselves or using vague language) showed a bigger drop in physiological fear response. Naming isn't just a report on the feeling — it appears to change it."));
+  s1.appendChild(el("div","cite",
+    "Lieberman, M. D., et al. (2007). Putting Feelings Into Words: Affect Labeling Disrupts Amygdala Activity in Response to Affective Stimuli. <i>Psychological Science</i>.<br>Kircanski, K., Lieberman, M. D., &amp; Craske, M. G. (2012). Feeling Better, Not Worse: Affect Labeling Enhances Exposure Therapy. <i>Psychological Science</i>.<br>Barrett, L. F. (2004, and later works). Emotional granularity and its relationship to emotion regulation and wellbeing.<br>Russell, J. A. (1980). A Circumplex Model of Affect. <i>Journal of Personality and Social Psychology</i>.<br>Plutchik, R. (1980, 2001). The wheel of emotions / psychoevolutionary theory of basic emotion families."
+  ));
+  wrap.appendChild(s1);
+
+  const s2 = el("section","");
+  s2.appendChild(el("h2","","How the identification key works"));
+  s2.appendChild(el("p","","Rather than presenting a flat list of 40 words and hoping one jumps out, the tool walks through a short <b>dichotomous key</b> — the same logical structure naturalists use to identify a species from a small number of branching either/or questions. Each question narrows the field:"));
+  const ul = el("ul","");
+  ul.innerHTML = `
+    <li><b>Valence</b> — is this unpleasant or pleasant to feel? (drawn from Russell's circumplex model of affect)</li>
+    <li><b>Arousal</b> — is the body activated, or low-energy and still? (the circumplex's second axis)</li>
+    <li><b>Direction</b> — for unpleasant states, is the impulse to push outward or pull back, and is the focus on something lost or on the self? This splits the four circumplex quadrants into the six classic emotion families used here (anger, fear, sadness, shame, joy, calm) — a structure adapted from Ekman's basic emotions and Plutchik's wheel.</li>
+  `;
+  s2.appendChild(ul);
+  s2.appendChild(el("p","","Landing in a family, you're shown six related words with short definitions — closer to a feelings wheel at that point — and asked to pick the one that resonates. The result screen then does the actual granularity work: a precise definition, a body-sensation check, an explicit contrast against the word people most often confuse it with, and two reflection prompts drawn from a mix of CBT- and ACT-informed practice (naming the target, checking for cognitive distortion, identifying a concrete next action)."));
+  wrap.appendChild(s2);
+
+  const s3 = el("section","");
+  s3.appendChild(el("h2","","Design &amp; build notes"));
+  s3.appendChild(el("div","grid2"));
+  const grid = s3.querySelector(".grid2");
+  const cards = [
+    ["Stack", "Single-file HTML, CSS, and vanilla JavaScript — no build step, no framework dependency. Chosen for portability: it opens directly in a browser and deploys to any static host (GitHub Pages, Netlify) with zero configuration."],
+    ["Architecture", "A small client-side state machine (input → valence → arousal → direction → family → result) with a single render() function, rather than a component framework — appropriate for the scope, and easy to port into React/Next as componentized views if the project grows."],
+    ["Data model", "36 emotions across 6 families, each with a definition, body sensations, a differentiator against a commonly confused neighbor, two reflection prompts, and one to two suggested actions — structured as a plain JS object, easy to extend or move into a CMS/database later."],
+    ["Privacy", "Nothing leaves the browser. The optional “save entry” log uses localStorage only — there's no backend, no analytics, and no account. Worth stating plainly to users of anything emotion-adjacent."],
+    ["Where this could go next", "A real backend would let entries persist across devices and power a longitudinal view — a person's emotional vocabulary and patterns over weeks or months. An NLP step could also pre-suggest a starting family from the free-text word instead of always asking the two/three orienting questions."],
+    ["Why this project", "Built to sit at the intersection of clinical psychology and product/UX — translating a specific, citable mechanism (affect labeling) into an interaction someone can actually use, rather than a generic 'mood tracker.'"]
+  ];
+  cards.forEach(([h,p])=>{
+    const mc = el("div","mini-card");
+    mc.appendChild(el("h4","",h));
+    mc.appendChild(el("p","",p));
+    grid.appendChild(mc);
+  });
+  wrap.appendChild(s3);
+
+  const disc = el("div","disclaimer",
+    "This tool is an educational and reflective aid, not a diagnostic or clinical instrument, and it doesn't store or transmit data anywhere beyond your own browser. If what you're feeling is persistent, overwhelming, or includes thoughts of harming yourself, please reach out to a licensed mental health professional or a crisis line in your area rather than relying on a self-guided tool."
+  );
+  wrap.appendChild(disc);
+
+  return wrap;
+}
+
+/* =========================================================
+   THINKING LOGIC PAGE
+   ========================================================= */
+function renderThinking(){
+  const wrap = el("div","about");
+
+  const hero = el("div","hero-about");
+  hero.appendChild(el("p","eyebrow","THINKING LOGIC"));
+  hero.appendChild(el("h1","","How this was reasoned through — the logic, the psychology, and where it goes next"));
+  hero.appendChild(el("p","","This page is the deliberately exposed version of the thinking that usually stays in a design doc. Three layers: the decision logic that runs the interaction, the psychological case for why that logic is the right one, and the roadmap for what a fuller version of this would need."));
+  wrap.appendChild(hero);
+
+  const s1 = el("section","");
+  s1.appendChild(el("h2","","Layer 1 — the decision logic"));
+  s1.appendChild(el("p","","The app is a small state machine, not a form. Every screen is a function of one state object: <code>{ vague, valence, arousal, focus, familyId, emotionId }</code>. Nothing is stored in the DOM — the DOM is just a rendering of that object at a given moment, which is why “back” and “start over” are just state resets rather than browser history tricks."));
+  s1.appendChild(el("p","","The branching itself is a <b>dichotomous key</b> — three questions, maximum, before you reach a family of words:"));
+  const ul1 = el("ul","");
+  ul1.innerHTML = `
+    <li><b>Q1 — Valence:</b> unpleasant or pleasant. Cuts the entire emotional field in half immediately.</li>
+    <li><b>Q2 — Arousal:</b> activated or low-energy. Cuts the remaining half again. Two questions now place you in one of four quadrants — this is Russell's circumplex model, made interactive.</li>
+    <li><b>Q3 — Direction</b> (only asked on the unpleasant side, where the four families compress into two per quadrant): push vs. pull for high arousal (anger vs. fear), loss vs. self for low arousal (sadness vs. shame). The pleasant side doesn't need this — joy and calm are already distinct enough after two questions.</li>
+  `;
+  s1.appendChild(ul1);
+  s1.appendChild(el("p","","Three questions, not thirty. The logic deliberately stops narrowing by <i>question</i> and switches to narrowing by <i>recognition</i> — you're shown six words in a family and asked to pick the one that resonates, rather than answered into a single word by the system. That handoff matters: a system that insists it knows your exact feeling from y/n questions alone is overclaiming. A system that narrows the field and then asks you to recognize the word is closer to how naming actually works."));
+  wrap.appendChild(s1);
+
+  const s2 = el("section","");
+  s2.appendChild(el("h2","","Layer 2 — why this is the right logic, psychologically"));
+  s2.appendChild(el("p","","Three research findings shaped the design directly, not just the copy:"));
+  const ul2 = el("ul","");
+  ul2.innerHTML = `
+    <li><b>Affect labeling reduces amygdala reactivity</b> (Lieberman et al., 2007) — which is why the tool's job is to produce a <i>specific word</i>, not a mood score or a color on a wheel. The output that matters is the label itself.</li>
+    <li><b>Specific language outperforms vague language during distress</b> (Kircanski et al., 2012, on exposure and fear) — which is why the “compare” box on every result exists. Landing on “frustration” isn't useful if you'd have used the same word for “rage.” Differentiation, not just labeling, is the mechanism worth optimizing for.</li>
+    <li><b>Granularity is a skill, not a fixed trait</b> (Barrett and colleagues) — which is why the tool teaches the underlying structure (valence, arousal, family) rather than hiding it behind a black box. Someone who uses this ten times should start recognizing the pattern without needing the questions — the scaffolding is meant to become unnecessary.</li>
+  `;
+  s2.appendChild(ul2);
+  s2.appendChild(el("p","","There's also a deliberate omission worth naming: the tool never tries to <i>diagnose</i>. It narrows toward a word the person recognizes as true, and stops there. The “why it matters” and “what to do with it” sections are psychoeducation and reflection prompts, not treatment — that boundary is a clinical judgment call, not just a legal one."));
+  wrap.appendChild(s2);
+
+  const s3 = el("section","");
+  s3.appendChild(el("h2","","Layer 3 — where this goes next"));
+  s3.appendChild(el("p","","As a portfolio piece, the interesting story isn't that it's finished — it's that the next steps are specific and defensible:"));
+  s3.appendChild(el("div","grid2"));
+  const grid = s3.querySelector(".grid2");
+  const cards = [
+    ["Persistence", "Move the “save entry” log from localStorage to a real backend (Supabase, for instance) so a person's vocabulary and patterns build up across devices and over months, not just one browser session."],
+    ["Smarter entry point", "Right now the free-text word is just a label shown back to the user. A lightweight NLP step could pre-weight the first one or two questions from that word (“stressed” leans unpleasant + activated), turning three questions into one confirmation instead of a cold start."],
+    ["Longitudinal view", "A second screen showing frequency of families and words over time — not to gamify emotions, but because noticing “I land on resentment three times a week” is itself a clinically useful pattern a person might otherwise never see."],
+    ["Practitioner-facing mode", "A version a therapist could hand a client between sessions, with an optional shareable summary — turning a solo self-reflection tool into something that plugs into an actual therapeutic relationship."],
+    ["Broader taxonomy", "36 words across 6 families is a deliberately manageable starting set. A larger, culturally-adapted vocabulary (relevant to Faizan's prior work on culturally-adapted intake tools) would need native-language review, not just translation."],
+    ["Platform port", "The current vanilla JS build is intentionally disposable — the state machine and data model are already separated cleanly enough to lift into React/Next components if this needed to sit inside a larger product rather than stand alone."]
+  ];
+  cards.forEach(([h,p])=>{
+    const mc = el("div","mini-card");
+    mc.appendChild(el("h4","",h));
+    mc.appendChild(el("p","",p));
+    grid.appendChild(mc);
+  });
+  wrap.appendChild(s3);
+
+  return wrap;
+}
+
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, s=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[s]));
+}
+
+render();
+</script>
+</body>
+</html>
